@@ -1,6 +1,7 @@
 package br.com.precocerto.API.Service;
 
-import br.com.precocerto.API.model.DadosMarcaOuModelo;
+import br.com.precocerto.API.model.Dados;
+import br.com.precocerto.API.model.Modelos;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.Comparator;
@@ -34,10 +35,24 @@ public class Principal {
         }
 
         var json = consumo.ObeterDados(endereco);
-        var marcas = conversor.obterLista(json, DadosMarcaOuModelo.class);
+        var marcas = conversor.obterLista(json, Dados.class);
 
         marcas.stream()
-                .sorted(Comparator.comparing(DadosMarcaOuModelo::codigo))
+                .sorted(Comparator.comparing(Dados::codigo))
                 .forEach(System.out::println);
+
+        System.out.println("\n Digite o codigo do modelo desejado");
+        var modelo = reader.nextInt();
+
+        endereco = endereco + "/" + modelo  + "/modelos";
+
+        json = consumo.ObeterDados(endereco);
+
+        var modeloLista = conversor.obterDados(json, Modelos.class);
+
+        modeloLista.modelos().stream()
+                .sorted(Comparator.comparing(Dados::codigo))
+                .forEach(System.out::println);
+
     }
 }

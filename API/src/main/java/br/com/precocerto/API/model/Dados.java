@@ -1,6 +1,6 @@
 package br.com.precocerto.API.model;
 
-public record DadosMarcaOuModelo(
+public record Dados(
         int codigo,
         String nome
 ) {
