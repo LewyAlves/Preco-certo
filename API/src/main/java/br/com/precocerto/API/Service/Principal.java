@@ -1,39 +1,43 @@
 package br.com.precocerto.API.Service;
 
-import br.com.precocerto.API.model.DadosMarca;
+import br.com.precocerto.API.model.DadosMarcaOuModelo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Principal {
 
-    ConsumoApi api = new ConsumoApi();
+    ConsumoApi consumo = new ConsumoApi();
     Scanner reader = new Scanner(System.in);
-    String address = "https://parallelum.com.br/fipe/api/v1/";
+    ConverteDados conversor = new ConverteDados();
+    String url = "https://parallelum.com.br/fipe/api/v1/";
 
     public void Menu() throws JsonProcessingException {
         System.out.println("""
+                *************************
                 O que você deseja buscar?
-                carros
-                caminhoes
-                motos
+                Carro
+                Caminhão
+                Moto
+                **************************
                 """);
         var escolhaDoVeiculo = reader.nextLine();
-        var json = api.ObeterDados(address + escolhaDoVeiculo + "/marcas");
+        String endereco;
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            List<DadosMarca> marcas = mapper.readValue(json, new TypeReference<List<DadosMarca>>() {
-            });
-            for (DadosMarca marca: marcas){
-                System.out.println("Codigo: " + marca.codigo() + " Nome: " + marca.nome());
-            }
-        } catch (JsonProcessingException e){
-            throw new RuntimeException("Deu erro");
+        if (escolhaDoVeiculo.toLowerCase().contains("car")) {
+            endereco = url + "carros/marcas";
+        } else if (escolhaDoVeiculo.toLowerCase().contains("m")) {
+            endereco = url + "motos/marcas";
+        } else {
+            endereco = url + "caminhoes/marcas";
         }
+
+        var json = consumo.ObeterDados(endereco);
+        var marcas = conversor.obterLista(json, DadosMarcaOuModelo.class);
+
+        marcas.stream()
+                .sorted(Comparator.comparing(DadosMarcaOuModelo::codigo))
+                .forEach(System.out::println);
     }
 }
