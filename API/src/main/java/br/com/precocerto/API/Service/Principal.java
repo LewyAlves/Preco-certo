@@ -21,10 +21,17 @@ public class Principal {
     public void Menu() throws JsonProcessingException {
         System.out.println("""
                 *************************
-                O que você deseja buscar?
+                        Bem vindo
+                *************************
+                Digite o tipo de veiculo
+                que deseja consultar.
+                
                 Carro
                 Caminhão
                 Moto
+                
+                **************************
+                       Tabela FIPE
                 **************************
                 """);
         var escolhaDoVeiculo = reader.nextLine();
@@ -32,7 +39,7 @@ public class Principal {
 
         if (escolhaDoVeiculo.toLowerCase().contains("car")) {
             endereco = url + "carros/marcas";
-        } else if (escolhaDoVeiculo.toLowerCase().contains("m")) {
+        } else if (escolhaDoVeiculo.toLowerCase().contains("mo")) {
             endereco = url + "motos/marcas";
         } else {
             endereco = url + "caminhoes/marcas";
@@ -57,7 +64,17 @@ public class Principal {
         modeloLista.modelos().stream()
                 .sorted(Comparator.comparing(Dados::nome))
                 .forEach(System.out::println);
-        
+        reader.nextLine();
+
+        System.out.println("\n Digite um trecho do modelo selecionado");
+        String modeloSelecionado = reader.nextLine();
+
+        List<Dados> filtroModelo= modeloLista.modelos().stream()
+                        .filter(m -> m.nome().toLowerCase().contains(modeloSelecionado.toLowerCase()))
+                                .collect(Collectors.toList());
+
+        System.out.println("\n filtro: ");
+        filtroModelo.forEach(System.out::println);
 
         System.out.println("\n Digite o codigo para visualizar as versões de anos do modelo desejado");
         var versao = reader.nextInt();
@@ -76,6 +93,7 @@ public class Principal {
             Veiculo veiculo = conversor.obterDados(json, Veiculo.class);
             veiculos.add(veiculo);
         }
-        veiculos.forEach(System.out::println);
+        veiculos.stream().filter(v -> v.ano() <= 2024)
+                .forEach(System.out::println);
     }
 }
