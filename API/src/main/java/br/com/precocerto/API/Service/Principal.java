@@ -2,10 +2,14 @@ package br.com.precocerto.API.Service;
 
 import br.com.precocerto.API.model.Dados;
 import br.com.precocerto.API.model.Modelos;
+import br.com.precocerto.API.model.Veiculo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -51,8 +55,27 @@ public class Principal {
         var modeloLista = conversor.obterDados(json, Modelos.class);
 
         modeloLista.modelos().stream()
-                .sorted(Comparator.comparing(Dados::codigo))
+                .sorted(Comparator.comparing(Dados::nome))
                 .forEach(System.out::println);
+        
 
+        System.out.println("\n Digite o codigo para visualizar as versões de anos do modelo desejado");
+        var versao = reader.nextInt();
+
+        endereco = endereco + "/" + versao + "/anos";
+
+        json = consumo.ObeterDados(endereco);
+
+        List<Dados> anos = conversor.obterLista(json, Dados.class);
+
+        List<Veiculo> veiculos = new ArrayList<>();
+
+        for (int i = 0; i < anos.size(); i++) {
+            var enderecoAnos = endereco + "/" + anos.get(i).codigo();
+            json = consumo.ObeterDados(enderecoAnos);
+            Veiculo veiculo = conversor.obterDados(json, Veiculo.class);
+            veiculos.add(veiculo);
+        }
+        veiculos.forEach(System.out::println);
     }
 }
